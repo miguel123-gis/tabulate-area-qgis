@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 12 22:28:55 2020
-
-@author: imper
-"""
 import os
 import geopandas as gpd
 import pandas as pd
@@ -23,6 +17,8 @@ for i in range(gdf1.shape[0]):
     df1.rename(columns={'geometry':'sqm'}, inplace=True)
     df2 = df1.groupby(['type']).sum()
     print(df2)
+
+# Still working on the final CSV with the results from all 39 municipalities
 cols = gdf2.DESCRIPT.unique()
 rows = gdf1['NAME_2'].values
 df3 = pd.DataFrame([range(len(cols))], range(len(rows)))
@@ -31,6 +27,5 @@ cols.sort()
 df3.insert(0, 'zones', rows)
 df3 = pd.concat([df2, df3])
 df3 = df3.reset_index(drop=True)
-
 print(df3)
 
