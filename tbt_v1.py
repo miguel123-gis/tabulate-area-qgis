@@ -32,7 +32,7 @@ for a in range(gdf1.shape[0]):
     print(df2)
 
 """
-Working on this part - should add each df2 to a new dataframe with the values transposed
+Working on this part -should add each df2 to a new dataframe with the values transposed
 cols = gdf2.DESCRIPT.unique() # gets land use types
 rows = gdf1['NAME_2'].values # gets munis
 df3 = pd.DataFrame([range(len(cols))], range(len(rows))) # creates df
