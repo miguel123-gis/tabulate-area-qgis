@@ -1,0 +1,43 @@
+# both zone and class layers should be projected
+
+import os
+import geopandas as gpd
+import pandas as pd
+from geopandas import GeoDataFrame
+
+os.chdir(r'C:\Users\imper\Documents\new_GISfiles\tabulateArea_forQGIS\\')
+zone_shp = gpd.read_file('camSur_municities.shp') 
+class_shp = gpd.read_file('camSur_landCover_2003.shp')
+
+data = []
+for a in range(zone_shp.shape[0]):
+    zone_field = zone_shp.loc[zone_shp['NAME_2'] == zone_shp['NAME_2'][a]]
+    intersection = gpd.overlay(zone_field, class_shp, how='intersection') 
+    area_sqm = intersection['geometry'].map(lambda p: p.area) 
+    type_in = intersection['DESCRIPT'].values.tolist()
+    type_all = class_shp['DESCRIPT'].values.tolist()
+    type_all_uniq = []
+    for i in type_all:
+        if i not in type_all_uniq: 
+            type_all_uniq.append(i)
+    type_out = set(type_all_uniq) - set(type_in)
+    type_out = list(type_out)
+    df1 = area_sqm.to_frame() 
+    df1.insert(0, 'type', type_in) 
+    df1.rename(columns={'geometry':'sqm'}, inplace=True) 
+    df2 = df1.groupby(['type']).sum() 
+    df2 = df2.reset_index(drop=False) 
+    index = df2.index 
+    index.name = zone_shp['NAME_2'].values[a]
+    for i in type_out:
+        df2.loc[len(df2), 'type'] = i
+    df2.sort_values(by=['type'], inplace=True)
+    df2_transposed = df2.T
+    values = list(df2_transposed.loc['sqm'].values)
+    data.append(values)
+cols = class_shp.DESCRIPT.unique() 
+cols.sort() 
+rows = zone_shp['NAME_2'].values 
+df3 = pd.DataFrame(data, columns = cols) 
+df3.insert(0, 'zones', rows) 
+df3.to_csv('CamarinesSur_munis_landCover_tabulated.csv')
